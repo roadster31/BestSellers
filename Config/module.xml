@@ -4,11 +4,11 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>BestSellers\BestSellers</fullnamespace>
     <descriptive locale="en_US">
-        <title>A loop to get your best selling products</title>
+        <title>Display your best sellers on your home page, and get information about products sales</title>
     </descriptive>
 
     <descriptive locale="fr_FR">
-        <title>Une boucle qui retourne les produits les plus vendus</title>
+        <title>Afficher vos produits les plus vendus sur votre page d'acceuil, et obtenez des détails sur les ventes de vos produits</title>
     </descriptive>
     <languages>
         <language>en_US</language>
