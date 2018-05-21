@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <loop name="best_selling_products" class="BestSellers\Loop\BestSellerLoop" />
+    </loops>
+
+    <services>
+        <service id="best_sellers.event_listener" class="BestSellers\EventListeners\EventManager">
+            <argument id="thelia.cache" type="service"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
+
+    <hooks>
+        <hook id="best_sellers.hook.back" class="BestSellers\Hook\HookManager">
+            <tag name="hook.event_listener" event="main.top-menu-tools" type="back" method="onMainTopMenuTools" />
+            <tag name="hook.event_listener" event="product.modification.form-right.bottom" type="back" templates="render:product-edit.html" />
+        </hook>
+
+        <hook id="best_sellers.hook.front">
+            <tag name="hook.event_listener" event="home.body" templates="render:home-body.html" />
+        </hook>
+    </hooks>
+</config>

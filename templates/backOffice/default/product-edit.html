@@ -1,0 +1,5 @@
+{loop type="best_selling_products" name="sales-count" backend_context=true visible='*' id=$product_id return_url=false}
+    <div class="well well-sm">
+        {intl d='bestsellers.bo.default' l="Total sales for this product: <strong>%count</strong>" count=$SOLD_QUANTITY|round}
+    </div>
+{/loop}
