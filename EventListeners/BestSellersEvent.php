@@ -28,6 +28,8 @@ class BestSellersEvent extends ActionEvent
     /** @var array */
     protected $bestSellingProductsData = [];
 
+    protected $totalSales = 0;
+
     /**
      * BestSellersEvent constructor.
      * @param $startDate
@@ -91,6 +93,24 @@ class BestSellersEvent extends ActionEvent
     public function setBestSellingProductsData($bestSellingProductsData)
     {
         $this->bestSellingProductsData = $bestSellingProductsData;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalSales()
+    {
+        return $this->totalSales;
+    }
+
+    /**
+     * @param int $totalSales
+     * @return $this
+     */
+    public function setTotalSales($totalSales)
+    {
+        $this->totalSales = $totalSales;
         return $this;
     }
 }

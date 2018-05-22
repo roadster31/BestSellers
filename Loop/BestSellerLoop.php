@@ -53,7 +53,9 @@ class BestSellerLoop extends Product
                             'new',
                             'random',
                             'given_id',
-                            'sold_count', 'sold_count_reverse'
+                            'sold_count', 'sold_count_reverse',
+                            'sold_amount', 'sold_amount_reverse',
+                            'sale_ratio', 'sale_ratio_reverse'
                         ]
                     )
                 ),
@@ -73,18 +75,29 @@ class BestSellerLoop extends Product
 
         $this->dispatcher->dispatch(BestSellers::GET_BEST_SELLING_PRODUCTS, $event);
 
-        $caseClause = '';
+        $caseClause = $caseSalesClause = '';
 
-        array_walk($event->getBestSellingProductsData(), function($item) use (&$caseClause) {
+        array_walk($event->getBestSellingProductsData(), function($item) use (&$caseClause, &$caseSalesClause) {
             $caseClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_quantity']);
+            $caseSalesClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_sales']);
         });
 
         if (! empty($caseClause)) {
             $query
                 ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
+                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
             ;
         } else {
-            $query->withColumn('NULL', 'sold_quantity');
+            $query
+                ->withColumn('(0)', 'sold_quantity')
+                ->withColumn('(0)', 'sold_amount')
+                ;
+        }
+
+        if ($event->getTotalSales() !== 0) {
+            $query->withColumn("(select 100 * sold_amount / " . $event->getTotalSales() . ")", 'sale_ratio');
+        } else {
+            $query->withColumn('(0)', 'sale_ratio');
         }
 
         $orders  = $this->getOrder();
@@ -96,6 +109,18 @@ class BestSellerLoop extends Product
                     break;
                 case "sold_count_reverse":
                     $query->orderBy('sold_quantity', Criteria::DESC);
+                    break;
+                case "sold_amount":
+                    $query->orderBy('sold_amount', Criteria::ASC);
+                    break;
+                case "sold_amount_reverse":
+                    $query->orderBy('sold_amount', Criteria::DESC);
+                    break;
+                case "sale_ratio":
+                    $query->orderBy('sale_ratio', Criteria::ASC);
+                    break;
+                case "sale_ratio_reverse":
+                    $query->orderBy('sale_ratio', Criteria::DESC);
                     break;
             }
         }
@@ -111,7 +136,9 @@ class BestSellerLoop extends Product
     protected function addOutputFields(LoopResultRow $loopResultRow, $item)
     {
         $loopResultRow
-            ->set("SOLD_QUANTITY", $item->getVirtualColumn('sold_quantity') ?: 'oups')
+            ->set("SOLD_QUANTITY", $item->getVirtualColumn('sold_quantity'))
+            ->set("SOLD_AMOUNT", $item->getVirtualColumn('sold_amount'))
+            ->set("SALE_RATIO", $item->getVirtualColumn('sale_ratio'))
         ;
     }
 }

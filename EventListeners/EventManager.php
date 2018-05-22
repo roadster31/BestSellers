@@ -55,14 +55,15 @@ class EventManager extends BaseAction implements EventSubscriberInterface
         try {
             $cacheItem = $this->cacheAdapter->getItem($cacheKey);
 
-            if (! $cacheItem->isHit()) {
+            if (true || ! $cacheItem->isHit()) {
                 /** @var PdoConnection $con */
                 $con = Propel::getConnection();
 
                 $query = "
                     SELECT 
                         " . ProductTableMap::ID . " as product_id,
-                        SUM(" . OrderProductTableMap::QUANTITY . ") as total_quantity
+                        SUM(" . OrderProductTableMap::QUANTITY . ") as total_quantity,
+                        SUM(".OrderProductTableMap::QUANTITY." * IF(" . OrderProductTableMap::WAS_IN_PROMO . "," . OrderProductTableMap::PROMO_PRICE . ", ".OrderProductTableMap::PRICE.")) as total_sales
                     FROM
                         " . OrderProductTableMap::TABLE_NAME . "
                     LEFT JOIN
@@ -94,19 +95,34 @@ class EventManager extends BaseAction implements EventSubscriberInterface
 
                 $data = [];
 
+                $totalSales = 0;
+
                 while ($res && $result = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                     $data[] = $result;
+
+                    $totalSales += $result['total_sales'];
                 }
 
+                $struct = [
+                    'data' => $data,
+                    'total_sales' => $totalSales
+                ];
+
                 $cacheItem
-                    ->set(json_encode($data))
+                    ->set(json_encode($struct))
                     ->expiresAfter(60 * BestSellers::CACHE_LIFETIME_IN_MINUTES)
                 ;
 
                 $this->cacheAdapter->save($cacheItem);
             }
 
-            $event->setBestSellingProductsData(json_decode($cacheItem->get(), true) ?: []);
+            $struct = json_decode($cacheItem->get(), true);
+
+            $event
+                ->setBestSellingProductsData($struct['data'])
+                ->setTotalSales($struct['total_sales'])
+            ;
+
         } catch (InvalidArgumentException $e) {
             // Nothing to do with this, return an empty result.
         }

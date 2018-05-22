@@ -73,6 +73,24 @@
                                 label={intl l="Sales total" d='bestsellers.bo.default'}
                                 }
                             </th>
+                            <th class="text-right">
+                                {admin_sortable_header
+                                current_order=$order
+                                order='sold_amount'
+                                reverse_order='sold_amount_reverse'
+                                path='/admin/best-sellers'
+                                label={intl l="Total amount" d='bestsellers.bo.default'}
+                                }
+                            </th>
+                            <th class="text-right">
+                                {admin_sortable_header
+                                current_order=$order
+                                order='sale_ratio'
+                                reverse_order='sale_ratio_reverse'
+                                path='/admin/best-sellers'
+                                label={intl l="Sale ratio" d='bestsellers.bo.default'}
+                                }
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -81,6 +99,9 @@
                                 <td><a href="{url path="/admin/products/update" product_id=$ID}">{$REF}</a></td>
                                 <td><a href="{url path="/admin/products/update" product_id=$ID}">{$TITLE}</a></td>
                                 <td class="text-right">{$SOLD_QUANTITY|round}</td>
+                                <td class="text-right">{format_money number=$SOLD_AMOUNT}</td>
+                                <td class="text-right">{$SALE_RATIO|string_format:"%.2f"}%</td>
+
                             </tr>
                         {/loop}
                         <tfoot>

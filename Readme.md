@@ -57,7 +57,9 @@ Toutes les variables de la boucle `product` sont disponibles.
 
 |Variable   |Description |
 |---        |--- |
-|$SOLD_QUANTITY    | La quantité de produit vendue sur la période considérée |
+|$SOLD_QUANTITY | La quantité de produit vendue sur la période considérée |
+|$SOLD_AMOUNT | Le montant total HT des ventes sur la période considérée |
+|$SALE_RATIO | Le pourcentage du CA surla période considérée |
 
 ### Exemple
 

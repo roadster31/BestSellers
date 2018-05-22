@@ -1,5 +1,14 @@
 {loop type="best_selling_products" name="sales-count" backend_context=true visible='*' id=$product_id return_url=false}
-    <div class="well well-sm">
-        {intl d='bestsellers.bo.default' l="Total sales for this product: <strong>%count</strong>" count=$SOLD_QUANTITY|round}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{intl d='bestsellers.bo.default' l="Statistics"}</h3>
     </div>
+    <div class="panel-body">
+        <ul>
+            <li>{intl d='bestsellers.bo.default' l="Total sales for this product: <strong>%count</strong>" count=$SOLD_QUANTITY|round}</li>
+            <li>{intl d='bestsellers.bo.default' l="Sold amount for this product: <strong>%count</strong>" count={format_money number=$SOLD_AMOUNT}}</li>
+            <li>{intl d='bestsellers.bo.default' l="% of sales: <strong>%count%</strong>" count=$SALE_RATIO|string_format:"%.2f"}</li>
+        </ul>
+    </div>
+</div>
 {/loop}
