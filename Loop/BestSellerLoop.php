@@ -77,7 +77,9 @@ class BestSellerLoop extends Product
 
         $caseClause = $caseSalesClause = '';
 
-        array_walk($event->getBestSellingProductsData(), function($item) use (&$caseClause, &$caseSalesClause) {
+        $productData = $event->getBestSellingProductsData();
+
+        array_walk($productData, function($item) use (&$caseClause, &$caseSalesClause) {
             $caseClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_quantity']);
             $caseSalesClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_sales']);
         });

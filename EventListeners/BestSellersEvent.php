@@ -83,7 +83,7 @@ class BestSellersEvent extends ActionEvent
      */
     public function getBestSellingProductsData()
     {
-        return $this->bestSellingProductsData;
+        return ! empty($this->bestSellingProductsData) ? $this->bestSellingProductsData : [];
     }
 
     /**
