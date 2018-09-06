@@ -4,24 +4,17 @@ Ce module vous fournit une boucle qui retourne vos meilleures (ou vos pires) ven
 
 ## Installation
 
-### Manually
-
-* Copy the module into ```<thelia_root>/local/modules/``` directory and be sure that the name of the module is BestSellers.
-* Activate it in your thelia administration panel
-
-### Composer
-
-Add it in your main thelia composer.json file
+Manuellement, ou avec composer :
 
 ```
-composer require your-vendor/best-sellers-module:~1.0
+composer require cqfdev/best-sellers-module:~1.0
 ```
 
 ## Usage
 
-Ce module affiche la liste des 4 meilleures ventes de votre boutique sur la page d'accueil, via le hook 'home.body'
+Ce module affiche les 4 meilleures ventes de votre boutique sur la page d'accueil, via le hook 'home.body'
 
-Vous pouvez aussi ajouter ou vous voulez dans votre template front office ou back-office une boucle `best_selling_products` pour afficher vos meilleures ou pires ventes.
+Vous pouvez aussi ajouter où vous voulez dans votre template front office ou back-office une boucle `best_selling_products` pour afficher vos meilleures ou pires ventes.
 
 Dans le back-office, vous pouvez voir vos meilleures ventes dans le menu "Outil".
 
@@ -29,7 +22,7 @@ Enfin, le nombre de ventes total d'un produit apparaît sur la fiche produit.
  
 ## Hook
 
-Ce module affiche la liste des 4 meilleures ventes de votre boutique sur la page d'accueil, via le hook `home.body`
+Le module affiche les 4 meilleures ventes de votre boutique sur la page d'accueil, via le hook `home.body`
 
 ## Loop
 
