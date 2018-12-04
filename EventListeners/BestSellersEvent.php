@@ -105,12 +105,12 @@ class BestSellersEvent extends ActionEvent
     }
 
     /**
-     * @param int $totalSales
+     * @param float $totalSales
      * @return $this
      */
     public function setTotalSales($totalSales)
     {
-        $this->totalSales = $totalSales;
+        $this->totalSales = floatval($totalSales);
         return $this;
     }
 }
