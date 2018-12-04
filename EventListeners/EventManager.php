@@ -15,7 +15,6 @@ use Propel\Runtime\Connection\PdoConnection;
 use Propel\Runtime\Propel;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Action\BaseAction;
 use Thelia\Model\Map\OrderProductTableMap;
@@ -44,7 +43,7 @@ class EventManager extends BaseAction implements EventSubscriberInterface
         ];
     }
 
-    public function calculateBestSellers(BestSellersEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function calculateBestSellers(BestSellersEvent $event)
     {
         $cacheKey = sprintf(
             "best_sellers_%s_%s",
