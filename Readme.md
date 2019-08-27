@@ -1,6 +1,6 @@
 # Best Sellers
 
-#en_US
+# en_US
 
 This modules provides a loop which return the best (or the worst) sales.
 
@@ -82,7 +82,7 @@ To get your 10 worst sales of all time :
     </ul>
 
 
-#fr_FR
+# fr_FR
 
 Ce module vous fournit une boucle qui retourne vos meilleures (ou vos pires) ventes.
 
