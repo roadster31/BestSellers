@@ -22,6 +22,8 @@ In the back-office, you can see your best sales in the "Tools" menu.
 
 Finally, the total number of sales of a product appears on the product sheet. 
 
+Update 1.2.0 : You can now choose which order statuses are taken into account to calculate your best sellers. A configuration page has been added to the module. Access it from the modules page.
+
 ## Hook
 
 This module shows the 4 best sales of your shop on the front page via the `home.body` hook.
@@ -103,6 +105,8 @@ Vous pouvez aussi ajouter où vous voulez dans votre template front office ou ba
 Dans le back-office, vous pouvez voir vos meilleures ventes dans le menu "Outil".
 
 Enfin, le nombre de ventes total d'un produit apparaît sur la fiche produit.
+
+Update 1.2.0 : Le module permet désormais de choisir quels status de commande utiliser pour calculer vos best sellers. Une page de configuration à été ajoutée, accessible depuis la page "modules".
  
 ## Hook
 

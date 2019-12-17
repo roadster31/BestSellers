@@ -12,6 +12,7 @@
 
 namespace BestSellers;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Module\BaseModule;
 
 class BestSellers extends BaseModule
@@ -21,6 +22,13 @@ class BestSellers extends BaseModule
 
     const GET_BEST_SELLING_PRODUCTS = "bestsellers.event.get_best_selling_products";
 
+    const BO_MESSAGE_DOMAIN = "bestsellers.bo.default";
+
     /* Data cache lifetime in minutes */
     const CACHE_LIFETIME_IN_MINUTES = 1440;
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        self::setConfigValue('order_types','2,3,4');
+    }
 }

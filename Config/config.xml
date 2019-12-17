@@ -24,5 +24,14 @@
         <hook id="best_sellers.hook.front">
             <tag name="hook.event_listener" event="home.body" templates="render:home-body.html" />
         </hook>
+
+        <hook id="best_sellers.configuration.hook" class="BestSellers\Hook\ConfigHook" scope="request">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration"/>
+        </hook>
+
     </hooks>
+
+    <forms>
+        <form name="bestsellers_configuration" class="BestSellers\Form\Configuration" />
+    </forms>
 </config>

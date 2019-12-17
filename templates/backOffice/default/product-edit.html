@@ -5,7 +5,7 @@
     </div>
     <div class="panel-body">
         <ul>
-            <li>{intl d='bestsellers.bo.default' l="Total sales for this product: <strong>%count</strong>" count=$SOLD_QUANTITY|round}</li>
+            <li>{intl d='bestsellers.bo.default' l="Total sales for this product: <strong>%count</strong>" count=$SOLD_QUANTITY|ROUND}</li>
             <li>{intl d='bestsellers.bo.default' l="Sold amount for this product: <strong>%count</strong>" count={format_money number=$SOLD_AMOUNT}}</li>
             <li>{intl d='bestsellers.bo.default' l="% of sales: <strong>%count%</strong>" count=$SALE_RATIO|string_format:"%.2f"}</li>
         </ul>
