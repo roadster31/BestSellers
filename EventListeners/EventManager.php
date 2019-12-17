@@ -59,6 +59,9 @@ class EventManager extends BaseAction implements EventSubscriberInterface
                 $con = Propel::getConnection();
 
                 $statusList = BestSellers::getConfigValue('order_types');
+                if (!$statusList || $statusList === '') {
+                    $statusList = '2,3,4';
+                }
 
                 $query = '
                     SELECT 
