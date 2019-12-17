@@ -14,7 +14,9 @@ class Configuration extends BaseForm
         $form = $this->formBuilder;
 
         $form->add('order','text',[
-            'data'=> BestSellers::getConfigValue('order_types')
+            'data'=> BestSellers::getConfigValue('order_types'),
+            'required' => true,
+            'empty_data' => '2,3,4',
         ]);
     }
 
