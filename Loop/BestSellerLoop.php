@@ -86,8 +86,8 @@ class BestSellerLoop extends Product
 
         if (! empty($caseClause)) {
             $query
-                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
-                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
+                ->withColumn('CASE ' . ProductTableMap::COL_ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
+                ->withColumn('CASE ' . ProductTableMap::COL_ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
             ;
         } else {
             $query

@@ -58,28 +58,33 @@ class EventManager extends BaseAction implements EventSubscriberInterface
                 /** @var PdoConnection $con */
                 $con = Propel::getConnection();
 
-                $query = "
+                $statusList = BestSellers::getConfigValue('order_types');
+                if (!$statusList || $statusList === '') {
+                    $statusList = '2,3,4';
+                }
+
+                $query = '
                     SELECT 
-                        " . ProductTableMap::ID . " as product_id,
-                        SUM(" . OrderProductTableMap::QUANTITY . ") as total_quantity,
-                        SUM(".OrderProductTableMap::QUANTITY." * IF(" . OrderProductTableMap::WAS_IN_PROMO . "," . OrderProductTableMap::PROMO_PRICE . ", ".OrderProductTableMap::PRICE.")) as total_sales
+                        ' . ProductTableMap::COL_ID . ' as product_id,
+                        SUM(' . OrderProductTableMap::COL_QUANTITY . ') as total_quantity,
+                        SUM(' . OrderProductTableMap::COL_QUANTITY. ' * IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . ',' . OrderProductTableMap::COL_PROMO_PRICE . ', ' . OrderProductTableMap::COL_PRICE . ')) as total_sales
                     FROM
-                        " . OrderProductTableMap::TABLE_NAME . "
+                        ' . OrderProductTableMap::TABLE_NAME . '
                     LEFT JOIN
-                        " . OrderTableMap::TABLE_NAME . " on " . OrderTableMap::ID . " = " . OrderProductTableMap::ORDER_ID . "
+                        ' . OrderTableMap::TABLE_NAME . ' on ' . OrderTableMap::COL_ID . ' = ' . OrderProductTableMap::COL_ORDER_ID . '
                     LEFT JOIN
-                        " . ProductTableMap::TABLE_NAME . " on " . ProductTableMap::REF . " = " . OrderProductTableMap::PRODUCT_REF . "
+                        ' . ProductTableMap::TABLE_NAME . ' on ' . ProductTableMap::COL_REF . ' = ' . OrderProductTableMap::COL_PRODUCT_REF . '
                     WHERE
-                        " . OrderTableMap::CREATED_AT . " >= ?    
+                        ' . OrderTableMap::COL_CREATED_AT . ' >= ?    
                     AND
-                        " . OrderTableMap::CREATED_AT . " <= ?    
+                        ' . OrderTableMap::COL_CREATED_AT . ' <= ?    
                     AND
-                        " . OrderTableMap::STATUS_ID . " not in (?, ?)
+                        ' . OrderTableMap::COL_STATUS_ID . ' IN ( '. $statusList .' )
                     GROUP BY  
-                        " . ProductTableMap::ID . "
+                        ' . ProductTableMap::COL_ID . '
                     ORDER BY
                         total_quantity desc
-                    ";
+                    ';
 
                 $query = preg_replace("/order([^_])/", "`order`$1", $query);
 
@@ -87,9 +92,7 @@ class EventManager extends BaseAction implements EventSubscriberInterface
 
                 $res = $stmt->execute([
                     $event->getStartDate()->format("Y-m-d H:i:s"),
-                    $event->getEndDate()->format("Y-m-d H:i:s"),
-                    OrderStatusQuery::getNotPaidStatus()->getId(),
-                    OrderStatusQuery::getCancelledStatus()->getId()
+                    $event->getEndDate()->format("Y-m-d H:i:s")
                 ]);
 
                 $data = [];
