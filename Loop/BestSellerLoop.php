@@ -79,15 +79,15 @@ class BestSellerLoop extends Product
 
         $productData = $event->getBestSellingProductsData();
 
-        array_walk($productData, function($item) use (&$caseClause, &$caseSalesClause) {
+        array_walk($productData, function ($item) use (&$caseClause, &$caseSalesClause) {
             $caseClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_quantity']);
             $caseSalesClause .= sprintf("WHEN %d THEN %f ", $item['product_id'], $item['total_sales']);
         });
 
         if (! empty($caseClause)) {
             $query
-                ->withColumn('CASE ' . ProductTableMap::COL_ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
-                ->withColumn('CASE ' . ProductTableMap::COL_ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
+                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
+                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
             ;
         } else {
             $query
