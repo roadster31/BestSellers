@@ -1,12 +1,20 @@
 <?php
-/*************************************************************************************/
-/*      Copyright (c) Franck Allimant, CQFDev                                        */
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /*      email : thelia@cqfdev.fr                                                     */
 /*      web : http://www.cqfdev.fr                                                   */
-/*                                                                                   */
+
 /*      For the full copyright and license information, please view the LICENSE      */
 /*      file that was distributed with this source code.                             */
-/*************************************************************************************/
 
 namespace BestSellers\EventListeners;
 
@@ -20,16 +28,14 @@ use Thelia\Action\BaseAction;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\OrderStatusQuery;
 
 class EventManager extends BaseAction implements EventSubscriberInterface
 {
-    /** @var AdapterInterface $cacheAdapter */
+    /** @var AdapterInterface */
     protected $cacheAdapter;
 
     /**
      * DigressivePriceListener constructor.
-     * @param AdapterInterface $cacheAdapter
      */
     public function __construct(AdapterInterface $cacheAdapter)
     {
@@ -39,14 +45,14 @@ class EventManager extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BestSellers::GET_BEST_SELLING_PRODUCTS => [ "calculateBestSellers", 128 ]
+            BestSellers::GET_BEST_SELLING_PRODUCTS => ['calculateBestSellers', 128],
         ];
     }
 
-    public function calculateBestSellers(BestSellersEvent $event)
+    public function calculateBestSellers(BestSellersEvent $event): void
     {
         $cacheKey = sprintf(
-            "best_sellers_%s_%s",
+            'best_sellers_%s_%s',
             $event->getStartDate()->format('Y-m-d'),
             $event->getEndDate()->format('Y-m-d')
         );
@@ -54,7 +60,7 @@ class EventManager extends BaseAction implements EventSubscriberInterface
         try {
             $cacheItem = $this->cacheAdapter->getItem($cacheKey);
 
-            if (! $cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
                 /** @var PdoConnection $con */
                 $con = Propel::getConnection();
 
@@ -64,35 +70,35 @@ class EventManager extends BaseAction implements EventSubscriberInterface
                 }
 
                 $query = '
-                    SELECT 
-                        ' . ProductTableMap::ID . ' as product_id,
-                        SUM(' . OrderProductTableMap::QUANTITY . ') as total_quantity,
-                        SUM(' . OrderProductTableMap::QUANTITY. ' * IF(' . OrderProductTableMap::WAS_IN_PROMO . ',' . OrderProductTableMap::PROMO_PRICE . ', ' . OrderProductTableMap::PRICE . ')) as total_sales
+                    SELECT
+                        '.ProductTableMap::ID.' as product_id,
+                        SUM('.OrderProductTableMap::QUANTITY.') as total_quantity,
+                        SUM('.OrderProductTableMap::QUANTITY.' * IF('.OrderProductTableMap::WAS_IN_PROMO.','.OrderProductTableMap::PROMO_PRICE.', '.OrderProductTableMap::PRICE.')) as total_sales
                     FROM
-                        ' . OrderProductTableMap::TABLE_NAME . '
+                        '.OrderProductTableMap::TABLE_NAME.'
                     LEFT JOIN
-                        ' . OrderTableMap::TABLE_NAME . ' on ' . OrderTableMap::ID . ' = ' . OrderProductTableMap::ORDER_ID . '
+                        '.OrderTableMap::TABLE_NAME.' on '.OrderTableMap::ID.' = '.OrderProductTableMap::ORDER_ID.'
                     LEFT JOIN
-                        ' . ProductTableMap::TABLE_NAME . ' on ' . ProductTableMap::REF . ' = ' . OrderProductTableMap::PRODUCT_REF . '
+                        '.ProductTableMap::TABLE_NAME.' on '.ProductTableMap::REF.' = '.OrderProductTableMap::PRODUCT_REF.'
                     WHERE
-                        ' . OrderTableMap::CREATED_AT . ' >= ?    
+                        '.OrderTableMap::CREATED_AT.' >= ?
                     AND
-                        ' . OrderTableMap::CREATED_AT . ' <= ?    
+                        '.OrderTableMap::CREATED_AT.' <= ?
                     AND
-                        ' . OrderTableMap::STATUS_ID . ' IN ( '. $statusList .' )
-                    GROUP BY  
-                        ' . ProductTableMap::ID . '
+                        '.OrderTableMap::STATUS_ID.' IN ( '.$statusList.' )
+                    GROUP BY
+                        '.ProductTableMap::ID.'
                     ORDER BY
                         total_quantity desc
                     ';
 
-                $query = preg_replace("/order([^_])/", "`order`$1", $query);
+                $query = preg_replace('/order([^_])/', '`order`$1', $query);
 
                 $stmt = $con->prepare($query);
 
                 $res = $stmt->execute([
-                    $event->getStartDate()->format("Y-m-d H:i:s"),
-                    $event->getEndDate()->format("Y-m-d H:i:s")
+                    $event->getStartDate()->format('Y-m-d H:i:s'),
+                    $event->getEndDate()->format('Y-m-d H:i:s'),
                 ]);
 
                 $data = [];
@@ -107,7 +113,7 @@ class EventManager extends BaseAction implements EventSubscriberInterface
 
                 $struct = [
                     'data' => $data,
-                    'total_sales' => $totalSales
+                    'total_sales' => $totalSales,
                 ];
 
                 $cacheItem
@@ -124,7 +130,6 @@ class EventManager extends BaseAction implements EventSubscriberInterface
                 ->setBestSellingProductsData($struct['data'])
                 ->setTotalSales($struct['total_sales'])
             ;
-
         } catch (InvalidArgumentException $e) {
             // Nothing to do with this, return an empty result.
         }

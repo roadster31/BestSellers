@@ -1,18 +1,31 @@
 <?php
-/*************************************************************************************/
-/*      Copyright (c) Franck Allimant, CQFDev                                        */
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /*      email : thelia@cqfdev.fr                                                     */
 /*      web : http://www.cqfdev.fr                                                   */
-/*                                                                                   */
+
 /*      For the full copyright and license information, please view the LICENSE      */
 /*      file that was distributed with this source code.                             */
-/*************************************************************************************/
 
 namespace BestSellers\Loop;
 
 use BestSellers\BestSellers;
 use BestSellers\EventListeners\BestSellersEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Product;
@@ -21,8 +34,8 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class BestSellerLoop
- * @package BestSellers\Loop
+ * Class BestSellerLoop.
+ *
  * @method string getStartDate()
  * @method string getEndDate()
  */
@@ -55,7 +68,7 @@ class BestSellerLoop extends Product
                             'given_id',
                             'sold_count', 'sold_count_reverse',
                             'sold_amount', 'sold_amount_reverse',
-                            'sale_ratio', 'sale_ratio_reverse'
+                            'sale_ratio', 'sale_ratio_reverse',
                         ]
                     )
                 ),
@@ -69,25 +82,25 @@ class BestSellerLoop extends Product
         $query = parent::buildModelCriteria();
 
         $startDate = $this->getStartDate() ? new \DateTime($this->getStartDate()) : null;
-        $endDate   = $this->getEndDate() ? new \DateTime($this->getEndDate()) : null;
+        $endDate = $this->getEndDate() ? new \DateTime($this->getEndDate()) : null;
 
         $event = new BestSellersEvent($startDate, $endDate);
 
-        $this->dispatcher->dispatch(BestSellers::GET_BEST_SELLING_PRODUCTS, $event);
+        $this->dispatcher->dispatch($event, BestSellers::GET_BEST_SELLING_PRODUCTS);
 
         $caseClause = $caseSalesClause = '';
 
         $productData = $event->getBestSellingProductsData();
 
-        array_walk($productData, function ($item) use (&$caseClause, &$caseSalesClause) {
-            $caseClause .= sprintf("WHEN %d THEN %F ", $item['product_id'], $item['total_quantity']);
-            $caseSalesClause .= sprintf("WHEN %d THEN %F ", $item['product_id'], $item['total_sales']);
+        array_walk($productData, function ($item) use (&$caseClause, &$caseSalesClause): void {
+            $caseClause .= sprintf('WHEN %d THEN %F ', $item['product_id'], $item['total_quantity']);
+            $caseSalesClause .= sprintf('WHEN %d THEN %F ', $item['product_id'], $item['total_sales']);
         });
 
-        if (! empty($caseClause)) {
+        if (!empty($caseClause)) {
             $query
-                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseClause . ' ELSE 0 END', 'sold_quantity')
-                ->withColumn('CASE ' . ProductTableMap::ID . ' ' . $caseSalesClause . ' ELSE 0 END', 'sold_amount')
+                ->withColumn('CASE '.ProductTableMap::ID.' '.$caseClause.' ELSE 0 END', 'sold_quantity')
+                ->withColumn('CASE '.ProductTableMap::ID.' '.$caseSalesClause.' ELSE 0 END', 'sold_amount')
             ;
         } else {
             $query
@@ -97,31 +110,31 @@ class BestSellerLoop extends Product
         }
 
         if ($event->getTotalSales() !== 0) {
-            $query->withColumn("(select 100 * sold_amount / " . $event->getTotalSales() . ")", 'sale_ratio');
+            $query->withColumn('(select 100 * sold_amount / '.$event->getTotalSales().')', 'sale_ratio');
         } else {
             $query->withColumn('(0)', 'sale_ratio');
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "sold_count":
+                case 'sold_count':
                     $query->orderBy('sold_quantity', Criteria::ASC);
                     break;
-                case "sold_count_reverse":
+                case 'sold_count_reverse':
                     $query->orderBy('sold_quantity', Criteria::DESC);
                     break;
-                case "sold_amount":
+                case 'sold_amount':
                     $query->orderBy('sold_amount', Criteria::ASC);
                     break;
-                case "sold_amount_reverse":
+                case 'sold_amount_reverse':
                     $query->orderBy('sold_amount', Criteria::DESC);
                     break;
-                case "sale_ratio":
+                case 'sale_ratio':
                     $query->orderBy('sale_ratio', Criteria::ASC);
                     break;
-                case "sale_ratio_reverse":
+                case 'sale_ratio_reverse':
                     $query->orderBy('sale_ratio', Criteria::DESC);
                     break;
             }
@@ -131,16 +144,16 @@ class BestSellerLoop extends Product
     }
 
     /**
-     * @param LoopResultRow $loopResultRow
      * @param \Thelia\Model\Product $item
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function addOutputFields(LoopResultRow $loopResultRow, $item)
+    protected function addOutputFields(LoopResultRow $loopResultRow, $item): void
     {
         $loopResultRow
-            ->set("SOLD_QUANTITY", $item->getVirtualColumn('sold_quantity'))
-            ->set("SOLD_AMOUNT", $item->getVirtualColumn('sold_amount'))
-            ->set("SALE_RATIO", $item->getVirtualColumn('sale_ratio'))
+            ->set('SOLD_QUANTITY', $item->getVirtualColumn('sold_quantity'))
+            ->set('SOLD_AMOUNT', $item->getVirtualColumn('sold_amount'))
+            ->set('SALE_RATIO', $item->getVirtualColumn('sale_ratio'))
         ;
     }
 }
